@@ -3,7 +3,7 @@ import Navigation from './components/Navigation';
 import Dashboard from './components/Dashboard';
 import StudentList from './components/StudentList';
 import StudentDetail from './components/StudentDetail';
-import './App.css';
+import './index.css';
 
 // Wrapper component to handle route parameters
 const StudentDetailWrapper = () => {
