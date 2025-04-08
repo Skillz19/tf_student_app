@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useParams, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useParams, ScrollRestoration } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import Dashboard from './components/Dashboard';
 import StudentList from './components/StudentList';
@@ -9,13 +9,8 @@ import './index.css';
 // Wrapper component to handle route parameters
 const StudentDetailWrapper = () => {
   const { studentId } = useParams<{ studentId: string }>();
-  const navigate = useNavigate();
   
-  const handleBack = () => {
-    navigate('/students');
-  };
-  
-  return <StudentDetail studentId={studentId || ''} onBack={handleBack} />;
+  return <StudentDetail studentId={studentId || ''} />;
 };
 
 function App() {
