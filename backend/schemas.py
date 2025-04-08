@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, validator
 from datetime import date
 from typing import Optional
 
@@ -35,7 +35,7 @@ class StudentBase(BaseModel):
     dob: date
     personal_tutor_id: int
 
-    @field_validator('dob')
+    @validator('dob')
     @classmethod
     def dob_in_past(cls, v):
         if v >= date.today():
@@ -54,7 +54,7 @@ class GradeBase(BaseModel):
     module_id: int
     score: float
 
-    @field_validator('score')
+    @validator('score')
     @classmethod
     def validate_score(cls, v):
         if not 0 <= v <= 1:
@@ -63,4 +63,5 @@ class GradeBase(BaseModel):
 
 class GradeResponse(GradeBase):
     class Config:
-        from_attributes: True
+        from_attributes = True
+        orm_mode = True 
