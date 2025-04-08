@@ -1,17 +1,26 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Student, getStudent, getAllModules, Module, getStudentGrades, Grade } from '../services';
 
 interface StudentDetailProps {
   studentId: string;
-  onBack: () => void;
 }
 
-const StudentDetail = ({ studentId, onBack }: StudentDetailProps) => {
+const StudentDetail = ({ studentId }: StudentDetailProps) => {
+  const navigate = useNavigate();
   const [student, setStudent] = useState<Student | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
   const [grades, setGrades] = useState<Grade[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -88,10 +97,10 @@ const StudentDetail = ({ studentId, onBack }: StudentDetailProps) => {
         <strong className="font-bold">Error!</strong>
         <span className="block sm:inline"> {error || 'Student not found'}</span>
         <button 
-          onClick={onBack}
+          onClick={handleBack}
           className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
-          Back to List
+          Back
         </button>
       </div>
     );
@@ -101,10 +110,13 @@ const StudentDetail = ({ studentId, onBack }: StudentDetailProps) => {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
         <button 
-          onClick={onBack}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={handleBack}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center"
         >
-          Back to List
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+          </svg>
+          Back
         </button>
       </div>
 
