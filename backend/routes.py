@@ -22,7 +22,6 @@ def get_all_students(db: Session = Depends(get_db)):
     result = []
     
     for student in students:
-        # Calculate average and classification
         grades = [grade.score for grade in student.grades]
         avg = round(sum(grades) / len(grades), 2) if grades else 0
         
@@ -40,7 +39,6 @@ def get_student(student_id: str, db: Session = Depends(get_db)):
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
     
-    # Calculate average and classification
     grades = [grade.score for grade in student.grades]
     avg = round(sum(grades) / len(grades), 2) if grades else 0
     
