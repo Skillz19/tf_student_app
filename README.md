@@ -2,6 +2,17 @@
 
 A web application for managing student grades, calculating averages, and displaying classifications.
 
+## Features
+
+- Display student information with grades
+- Calculate and display average grades for each student
+- Classify students based on their grades:
+  - Distinction (70%+)
+  - Merit (60%+)
+  - Pass (40%+)
+  - Fail (<40%)
+- Filter students by classification
+- View detailed statistics and visualizations
 
 ## Tech Stack
 
@@ -9,6 +20,12 @@ A web application for managing student grades, calculating averages, and display
 - FastAPI (Python)
 - SQLAlchemy (ORM)
 - SQLite (Database)
+
+### Frontend
+- React (TypeScript)
+- Tailwind CSS (Styling)
+- React Router (Navigation)
+- Axios (API Communication)
 
 ## Project Structure
 
@@ -21,6 +38,14 @@ tf_student_app/
 │   ├── schemas.py       # Pydantic schemas
 │   ├── sample_data.py   # Script to populate the database with sample data
 │   └── main.py          # FastAPI application
+├── frontend/
+│   ├── src/
+│   │   ├── components/  # React components
+│   │   ├── services/    # API services
+│   │   ├── App.tsx      # Main application component
+│   │   └── main.tsx     # Entry point
+│   ├── package.json     # Dependencies
+│   └── tailwind.config.js # Tailwind configuration
 └── README.md            # Documentation
 ```
 
@@ -48,6 +73,22 @@ tf_student_app/
    uvicorn main:app --reload
    ```
 
+### Frontend Setup
+
+1. Navigate to the frontend directory:
+   ```
+   cd frontend
+   ```
+
+2. Install dependencies:
+   ```
+   npm install
+   ```
+
+3. Run the development server:
+   ```
+   npm run dev
+   ```
 
 4. Open your browser and navigate to `http://localhost:5173`
 
