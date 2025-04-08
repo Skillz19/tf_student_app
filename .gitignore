@@ -3,3 +3,4 @@ backend/tests/__pycache__/
 backend/students.db
 frontend/public/tf_icon.png:Zone.Identifier
 students.db
+backend/tests/unit_tests/__pycache__/
