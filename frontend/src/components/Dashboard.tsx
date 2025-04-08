@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Student, getAllStudents } from '../services/api';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -186,23 +188,46 @@ const Dashboard = () => {
           </p>
         </div>
         <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
-          <div className="h-64 flex items-end space-x-2">
-            {students.map((student) => (
-              <div 
-                key={student.student_id} 
-                className="flex-1 bg-blue-500 hover:bg-blue-600 transition-colors"
-                style={{ 
-                  height: `${student.average_grade * 100}%`,
-                  minHeight: '20px'
-                }}
-                title={`${student.first_name} ${student.last_name}: ${formatGrade(student.average_grade)}`}
-              ></div>
-            ))}
+          <div className="flex">
+            {/* Vertical axis */}
+            <div className="flex flex-col justify-between pr-2 text-xs text-gray-500 w-12">
+              <span>100%</span>
+              <span>75%</span>
+              <span>50%</span>
+              <span>25%</span>
+              <span>0%</span>
+            </div>
+            {/* Grid lines and bars */}
+            <div className="flex-1">
+              {/* Grid lines */}
+              <div className="relative h-64">
+                <div className="absolute w-full border-t border-gray-200" style={{ bottom: '100%' }}></div>
+                <div className="absolute w-full border-t border-gray-200" style={{ bottom: '75%' }}></div>
+                <div className="absolute w-full border-t border-gray-200" style={{ bottom: '50%' }}></div>
+                <div className="absolute w-full border-t border-gray-200" style={{ bottom: '25%' }}></div>
+                <div className="absolute w-full border-t border-gray-200" style={{ bottom: '0%' }}></div>
+                {/* Bars */}
+                <div className="relative h-full flex items-end space-x-1">
+                  {students.map((student) => (
+                    <div 
+                      key={student.student_id} 
+                      className="flex-1 bg-blue-500 hover:bg-blue-600 transition-colors cursor-pointer"
+                      style={{ 
+                        height: `${student.average_grade * 100}%`,
+                        minHeight: '2px'
+                      }}
+                      onClick={() => navigate(`/students/${student.student_id}`)}
+                      title={`${student.first_name} ${student.last_name}: ${formatGrade(student.average_grade)}`}
+                      role="button"
+                      aria-label={`View details for ${student.first_name} ${student.last_name}`}
+                    ></div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="mt-4 flex justify-between text-xs text-gray-500">
-            <span>0%</span>
-            <span>50%</span>
-            <span>100%</span>
+          <div className="mt-2 text-xs text-gray-500 text-center">
+            Student Grades
           </div>
         </div>
       </div>
