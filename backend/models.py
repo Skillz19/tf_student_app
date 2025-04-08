@@ -15,7 +15,7 @@ class Tutor(Base):
     personal_students = relationship("Student", back_populates="personal_tutor")
 
     def __repr__(self):
-        return f"<Tutor(id={self.id}, name='{self.name}', email='{self.email}')>"
+        return f"<Tutor(id={self.id}, title='{self.title}', name='{self.first_name} {self.last_name}', email='{self.email}')>"
 
 class Module(Base):
     __tablename__ = "modules"
@@ -44,7 +44,7 @@ class Student(Base):
     grades = relationship("Grade", back_populates="student")
 
     def __repr__(self):
-        return f"<Student(id='{self.student_id}', name='{self.first_name} {self.last_name}')>"
+        return f"<Student(id='{self.student_id}', name='{self.first_name} {self.last_name}', dob={self.dob}, tutor_id={self.personal_tutor_id})>"
 
 class Grade(Base):
     __tablename__ = "grades"
