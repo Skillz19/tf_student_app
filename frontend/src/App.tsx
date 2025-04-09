@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useParams, ScrollRestoration } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import Dashboard from './components/Dashboard';
 import StudentList from './components/StudentList';
