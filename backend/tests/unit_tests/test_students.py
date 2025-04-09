@@ -48,7 +48,7 @@ def test_create_student(client, sample_tutor):
     response = client.post(
         "/students/",
         json={
-            "student_id": "S001",
+            "student_id": "123456A",
             "first_name": "Jane",
             "last_name": "Smith",
             "dob": "2000-01-01",
@@ -57,14 +57,14 @@ def test_create_student(client, sample_tutor):
     )
     assert response.status_code == 200
     data = response.json()
-    assert data["student_id"] == "S001"
+    assert data["student_id"] == "123456A"
     assert data["first_name"] == "Jane"
     assert data["last_name"] == "Smith"
 
 def test_get_student(client, db, sample_tutor):
     # Create a student first
     student = Student(
-        student_id="S002",
+        student_id="234567B",
         first_name="Bob",
         last_name="Wilson",
         dob=date(2000, 2, 2),
@@ -77,21 +77,21 @@ def test_get_student(client, db, sample_tutor):
     response = client.get(f"/students/{student.student_id}")
     assert response.status_code == 200
     data = response.json()
-    assert data["student_id"] == "S002"
+    assert data["student_id"] == "234567B"
     assert data["first_name"] == "Bob"
 
 def test_get_all_students(client, db, sample_tutor):
     # Create multiple students
     students = [
         Student(
-            student_id="S003",
+            student_id="345678C",
             first_name="Alice",
             last_name="Brown",
             dob=date(2000, 3, 3),
             personal_tutor_id=sample_tutor.id
         ),
         Student(
-            student_id="S004",
+            student_id="456789D",
             first_name="Charlie",
             last_name="Davis",
             dob=date(2000, 4, 4),
@@ -108,13 +108,13 @@ def test_get_all_students(client, db, sample_tutor):
     data = response.json()
     assert len(data) >= 2
     student_ids = [s["student_id"] for s in data]
-    assert "S003" in student_ids
-    assert "S004" in student_ids
+    assert "345678C" in student_ids
+    assert "456789D" in student_ids
 
 def test_student_classification(client, db, sample_tutor, sample_module):
     # Create a student
     student = Student(
-        student_id="S005",
+        student_id="567890E",
         first_name="Eve",
         last_name="Johnson",
         dob=date(2000, 5, 5),
