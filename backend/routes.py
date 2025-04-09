@@ -9,6 +9,14 @@ from schemas import (
 )
 from database import get_db
 from typing import List
+from utils import (
+    build_student_response,
+    build_module_response,
+    build_tutor_response,
+    build_grade_response,
+    get_or_404,
+    check_exists
+)
 
 router = APIRouter()
 
@@ -19,68 +27,17 @@ def create_student(student: StudentBase, db: Session = Depends(get_db)):
     db.add(db_student)
     db.commit()
     db.refresh(db_student)
-    
-    # Calculate average grade and classification
-    grades = [grade.score for grade in db_student.grades]
-    avg = round(sum(grades) / len(grades), 2) if grades else 0
-    classification = (
-        "Distinction" if avg >= 0.7 
-        else "Merit" if avg >= 0.6 
-        else "Pass" if avg >= 0.4 
-        else "Fail"
-    )
-    
-    return {
-        "student_id": db_student.student_id,
-        "first_name": db_student.first_name,
-        "last_name": db_student.last_name,
-        "dob": db_student.dob,
-        "personal_tutor_id": db_student.personal_tutor_id,
-        "average_grade": avg,
-        "classification": classification
-    }
+    return build_student_response(db_student)
 
 @router.get("/students/", response_model=List[StudentResponse])
 def get_all_students(db: Session = Depends(get_db)):
     students = db.query(Student).all()
-    result = []
-    
-    for student in students:
-        grades = [grade.score for grade in student.grades]
-        avg = round(sum(grades) / len(grades), 2) if grades else 0
-        
-        result.append({
-            **student.__dict__,
-            "average_grade": avg,
-            "classification": (
-                "Distinction" if avg >= 0.7 
-                else "Merit" if avg >= 0.6 
-                else "Pass" if avg >= 0.4 
-                else "Fail"
-            )
-        })
-    
-    return result
+    return [build_student_response(student) for student in students]
 
 @router.get("/students/{student_id}", response_model=StudentResponse)
 def get_student(student_id: str, db: Session = Depends(get_db)):
-    student = db.query(Student).filter(Student.student_id == student_id).first()
-    if not student:
-        raise HTTPException(status_code=404, detail="Student not found")
-    
-    grades = [grade.score for grade in student.grades]
-    avg = round(sum(grades) / len(grades), 2) if grades else 0
-    
-    return {
-        **student.__dict__,
-        "average_grade": avg,
-        "classification": (
-            "Distinction" if avg >= 0.7 
-            else "Merit" if avg >= 0.6 
-            else "Pass" if avg >= 0.4 
-            else "Fail"
-        )
-    }
+    student = get_or_404(db, Student, student_id=student_id)
+    return build_student_response(student)
 
 @router.get("/students/{student_id}/grades", response_model=List[GradeResponse])
 def get_student_grades(student_id: str, db: Session = Depends(get_db)):
@@ -96,34 +53,17 @@ def create_module(module: ModuleBase, db: Session = Depends(get_db)):
     db.add(db_module)
     db.commit()
     db.refresh(db_module)
-    return {
-        "id": db_module.id,
-        "title": db_module.title,
-        "module_tutor_id": db_module.module_tutor_id
-    }
+    return build_module_response(db_module)
 
 @router.get("/modules/", response_model=List[ModuleResponse])
 def get_all_modules(db: Session = Depends(get_db)):
     modules = db.query(Module).all()
-    return [
-        {
-            "id": module.id,
-            "title": module.title,
-            "module_tutor_id": module.module_tutor_id
-        }
-        for module in modules
-    ]
+    return [build_module_response(module) for module in modules]
 
 @router.get("/modules/{module_id}", response_model=ModuleResponse)
 def get_module(module_id: int, db: Session = Depends(get_db)):
-    module = db.query(Module).filter(Module.id == module_id).first()
-    if not module:
-        raise HTTPException(status_code=404, detail="Module not found")
-    return {
-        "id": module.id,
-        "title": module.title,
-        "module_tutor_id": module.module_tutor_id
-    }
+    module = get_or_404(db, Module, id=module_id)
+    return build_module_response(module)
 
 # Tutors Endpoints
 @router.post("/tutors/", response_model=TutorResponse)
@@ -132,68 +72,38 @@ def create_tutor(tutor: TutorBase, db: Session = Depends(get_db)):
     db.add(db_tutor)
     db.commit()
     db.refresh(db_tutor)
-    return {
-        "id": db_tutor.id,
-        "first_name": db_tutor.first_name,
-        "last_name": db_tutor.last_name,
-        "email": db_tutor.email,
-        "title": db_tutor.title
-    }
+    return build_tutor_response(db_tutor)
 
 @router.get("/tutors/", response_model=List[TutorResponse])
 def get_all_tutors(db: Session = Depends(get_db)):
     tutors = db.query(Tutor).all()
-    return [
-        {
-            "id": tutor.id,
-            "first_name": tutor.first_name,
-            "last_name": tutor.last_name,
-            "email": tutor.email,
-            "title": tutor.title
-        }
-        for tutor in tutors
-    ]
+    return [build_tutor_response(tutor) for tutor in tutors]
 
 @router.get("/tutors/{tutor_id}", response_model=TutorResponse)
 def get_tutor(tutor_id: int, db: Session = Depends(get_db)):
-    tutor = db.query(Tutor).filter(Tutor.id == tutor_id).first()
-    if not tutor:
-        raise HTTPException(status_code=404, detail="Tutor not found")
-    return {
-        "id": tutor.id,
-        "first_name": tutor.first_name,
-        "last_name": tutor.last_name,
-        "email": tutor.email,
-        "title": tutor.title
-    }
+    tutor = get_or_404(db, Tutor, id=tutor_id)
+    return build_tutor_response(tutor)
 
 # Grades Endpoints
 @router.post("/grades/", response_model=GradeResponse)
 def create_grade(grade: GradeBase, db: Session = Depends(get_db)):
-    existing_grade = db.query(Grade).filter(
-        Grade.student_id == grade.student_id,
-        Grade.module_id == grade.module_id
-    ).first()
-    
-    if existing_grade:
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                f"Grade for student {grade.student_id} "
-                f"in module {grade.module_id} already exists"
-            )
+    if check_exists(db, Grade, student_id=grade.student_id, module_id=grade.module_id):
+        error_msg = (
+            f"Grade for student {grade.student_id} "
+            f"in module {grade.module_id} already exists"
         )
+        raise HTTPException(status_code=400, detail=error_msg)
     
     db_grade = Grade(**grade.dict())
     db.add(db_grade)
     db.commit()
     db.refresh(db_grade)
-    return db_grade
+    return build_grade_response(db_grade)
 
 @router.get("/grades/module/{module_id}", response_model=List[GradeResponse])
 def get_module_grades(module_id: int, db: Session = Depends(get_db)):
     grades = db.query(Grade).filter(Grade.module_id == module_id).all()
-    return grades
+    return [build_grade_response(grade) for grade in grades]
 
 @router.put("/grades/{student_id}/{module_id}", response_model=GradeResponse)
 def update_grade(
@@ -202,17 +112,11 @@ def update_grade(
     grade: GradeBase, 
     db: Session = Depends(get_db)
 ):
-    db_grade = db.query(Grade).filter(
-        Grade.student_id == student_id,
-        Grade.module_id == module_id
-    ).first()
-    
-    if not db_grade:
-        raise HTTPException(status_code=404, detail="Grade not found")
+    db_grade = get_or_404(db, Grade, student_id=student_id, module_id=module_id)
     
     for key, value in grade.dict().items():
         setattr(db_grade, key, value)
     
     db.commit()
     db.refresh(db_grade)
-    return db_grade
+    return build_grade_response(db_grade)
