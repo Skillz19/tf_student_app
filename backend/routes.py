@@ -1,8 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 from models import Student, Module, Tutor, Grade
-from schemas import *
+from schemas import (
+    StudentBase, StudentResponse,
+    ModuleBase, ModuleResponse,
+    TutorBase, TutorResponse,
+    GradeBase, GradeResponse
+)
 from database import get_db
 from typing import List
 
@@ -19,7 +23,12 @@ def create_student(student: StudentBase, db: Session = Depends(get_db)):
     # Calculate average grade and classification
     grades = [grade.score for grade in db_student.grades]
     avg = round(sum(grades) / len(grades), 2) if grades else 0
-    classification = "Distinction" if avg >= 0.7 else "Merit" if avg >= 0.6 else "Pass" if avg >= 0.4 else "Fail"
+    classification = (
+        "Distinction" if avg >= 0.7 
+        else "Merit" if avg >= 0.6 
+        else "Pass" if avg >= 0.4 
+        else "Fail"
+    )
     
     return {
         "student_id": db_student.student_id,
@@ -43,7 +52,12 @@ def get_all_students(db: Session = Depends(get_db)):
         result.append({
             **student.__dict__,
             "average_grade": avg,
-            "classification": "Distinction" if avg >= 0.7 else "Merit" if avg >= 0.6 else "Pass" if avg >= 0.4 else "Fail"
+            "classification": (
+                "Distinction" if avg >= 0.7 
+                else "Merit" if avg >= 0.6 
+                else "Pass" if avg >= 0.4 
+                else "Fail"
+            )
         })
     
     return result
@@ -60,7 +74,12 @@ def get_student(student_id: str, db: Session = Depends(get_db)):
     return {
         **student.__dict__,
         "average_grade": avg,
-        "classification": "Distinction" if avg >= 0.7 else "Merit" if avg >= 0.6 else "Pass" if avg >= 0.4 else "Fail"
+        "classification": (
+            "Distinction" if avg >= 0.7 
+            else "Merit" if avg >= 0.6 
+            else "Pass" if avg >= 0.4 
+            else "Fail"
+        )
     }
 
 @router.get("/students/{student_id}/grades", response_model=List[GradeResponse])
@@ -68,7 +87,6 @@ def get_student_grades(student_id: str, db: Session = Depends(get_db)):
     student = db.query(Student).filter(Student.student_id == student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
-    
     return student.grades
 
 # Modules Endpoints
@@ -160,7 +178,10 @@ def create_grade(grade: GradeBase, db: Session = Depends(get_db)):
     if existing_grade:
         raise HTTPException(
             status_code=400,
-            detail=f"Grade for student {grade.student_id} in module {grade.module_id} already exists"
+            detail=(
+                f"Grade for student {grade.student_id} "
+                f"in module {grade.module_id} already exists"
+            )
         )
     
     db_grade = Grade(**grade.dict())
@@ -169,18 +190,18 @@ def create_grade(grade: GradeBase, db: Session = Depends(get_db)):
     db.refresh(db_grade)
     return db_grade
 
-@router.get("/grades/student/{student_id}", response_model=List[GradeResponse])
-def get_student_grades(student_id: str, db: Session = Depends(get_db)):
-    grades = db.query(Grade).filter(Grade.student_id == student_id).all()
-    return grades
-
 @router.get("/grades/module/{module_id}", response_model=List[GradeResponse])
 def get_module_grades(module_id: int, db: Session = Depends(get_db)):
     grades = db.query(Grade).filter(Grade.module_id == module_id).all()
     return grades
 
 @router.put("/grades/{student_id}/{module_id}", response_model=GradeResponse)
-def update_grade(student_id: str, module_id: int, grade: GradeBase, db: Session = Depends(get_db)):
+def update_grade(
+    student_id: str, 
+    module_id: int, 
+    grade: GradeBase, 
+    db: Session = Depends(get_db)
+):
     db_grade = db.query(Grade).filter(
         Grade.student_id == student_id,
         Grade.module_id == module_id
