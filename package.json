@@ -1,0 +1,15 @@
+{
+  "name": "tf_student_app",
+  "private": true,
+  "scripts": {
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "husky": "^8.0.0",
+    "lint-staged": "^15.5.0"
+  },
+  "lint-staged": {
+    "frontend/src/**/*.{ts,tsx}": "cd frontend && npm run lint",
+    "**/*.py": "ruff check --fix"
+  }
+} 
