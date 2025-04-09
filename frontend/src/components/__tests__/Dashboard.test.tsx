@@ -3,6 +3,8 @@ import { screen } from '@testing-library/react';
 import Dashboard from '../Dashboard';
 import { renderWithRouter } from '../../test/utils';
 import { mockStudents } from '../../test/mocks/handlers';
+import { server } from '../../test/mocks/server';
+import { http, HttpResponse } from 'msw';
 
 describe('Dashboard Component', () => {
   it('renders loading state initially', () => {
@@ -44,7 +46,17 @@ describe('Dashboard Component', () => {
   });
 
   it('handles error state', async () => {
-    // You can use msw to mock a failed response here
-    // This will be implemented when we add error handling tests
+    // Override the default handler to simulate an error
+    server.use(
+      http.get('http://127.0.0.1:8000/students/', () => {
+        return HttpResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+      })
+    );
+    
+    renderWithRouter(<Dashboard />);
+    
+    // Wait for error message
+    await screen.findByText(/error/i);
+    expect(screen.getByText(/error/i)).toBeInTheDocument();
   });
 }); 
