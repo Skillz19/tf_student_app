@@ -1,6 +1,7 @@
 from pydantic import BaseModel, validator
 from datetime import date
 from typing import Optional
+import re
 
 # Tutor Schemas
 class TutorBase(BaseModel):
@@ -34,6 +35,15 @@ class StudentBase(BaseModel):
     last_name: str
     dob: date
     personal_tutor_id: int
+
+    @validator('student_id')
+    @classmethod
+    def validate_student_id(cls, v):
+        if not re.match(r'^[0-9]{6}[A-Z]$', v):
+            raise ValueError(
+                'Student ID must be 6 numbers followed by 1 uppercase letter'
+            )
+        return v
 
     @validator('dob')
     @classmethod
