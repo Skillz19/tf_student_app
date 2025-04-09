@@ -1,38 +1,40 @@
 from datetime import datetime
-from database import SessionLocal
 from models import Student, Tutor, Module, Grade
 import random
 import string   
-from sqlalchemy import inspect
 from database import engine, Base
+from sqlalchemy.orm import Session
 
 def generate_student_id():
     """Generate a student ID matching 6 digits + 1 letter (e.g., 123456A)"""
     return f"{random.randint(100000, 999999)}{random.choice(string.ascii_uppercase)}"
 
-def create_sample_data():
-    db = SessionLocal()
-
+def create_sample_data(db: Session):
     try:
-        # Check if tables exist and delete all records
-        inspector = inspect(db.get_bind())
-        if "grades" in inspector.get_table_names():
-            db.query(Grade).delete()
-        if "students" in inspector.get_table_names():
-            db.query(Student).delete()
-        if "modules" in inspector.get_table_names():
-            db.query(Module).delete()
-        if "tutors" in inspector.get_table_names():
-            db.query(Tutor).delete()
-        db.commit()
-
+        Base.metadata.drop_all(bind=engine)
         Base.metadata.create_all(bind=engine)
 
         # 1. Create Tutors
+        email_domain = "university.ac.uk"
         tutors = [
-            Tutor(title = "Dr", first_name="John", last_name="Smith", email="john.smith@university.ac.uk"),
-            Tutor(title="Prof", first_name="Brown", last_name="Johnson", email="brown.johnson@university.ac.uk"),
-            Tutor(title="Dr", first_name="Lee", last_name="Jones", email="lee.jones@university.ac.uk")
+            Tutor(
+                title="Dr",
+                first_name="John",
+                last_name="Smith",
+                email=f"john.smith@{email_domain}"
+            ),
+            Tutor(
+                title="Prof",
+                first_name="Brown",
+                last_name="Johnson",
+                email=f"brown.johnson@{email_domain}"
+            ),
+            Tutor(
+                title="Dr",
+                first_name="Lee",
+                last_name="Jones",
+                email=f"lee.jones@{email_domain}"
+            )
         ]
         db.add_all(tutors)
         db.commit()  # Flush to get tutor IDs
@@ -147,4 +149,6 @@ def create_sample_data():
         db.close()
 
 if __name__ == "__main__":
-    create_sample_data()
+    from database import SessionLocal
+    db = SessionLocal()
+    create_sample_data(db)
