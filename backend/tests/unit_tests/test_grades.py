@@ -98,14 +98,13 @@ def test_get_student_grades(client, setup_data, db):
     db.add(grade)
     db.commit()
 
-    # Test getting student grades
-    response = client.get(f"/grades/student/{setup_data['student'].student_id}")
+    # Test getting student grades using the correct endpoint
+    response = client.get(f"/students/{setup_data['student'].student_id}/grades")
     assert response.status_code == 200
-    data = response.json()
-    assert len(data) == 1
-    assert data[0]["student_id"] == setup_data["student"].student_id
-    assert data[0]["module_id"] == setup_data["module"].id
-    assert data[0]["score"] == 0.85
+    assert len(response.json()) == 1
+    assert response.json()[0]["score"] == 0.85
+    assert response.json()[0]["student_id"] == setup_data["student"].student_id
+    assert response.json()[0]["module_id"] == setup_data["module"].id
 
 def test_get_module_grades(client, setup_data, db):
     # Create a grade first
