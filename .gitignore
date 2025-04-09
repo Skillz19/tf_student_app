@@ -1,7 +1,4 @@
-backend/__pycache__/
-backend/tests/__pycache__/
-backend/students.db
-frontend/public/tf_icon.png:Zone.Identifier
+__pycache__/
 students.db
-backend/tests/unit_tests/__pycache__/
+frontend/public/tf_icon.png:Zone.Identifier
 node_modules/
